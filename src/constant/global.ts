@@ -1,0 +1,11 @@
+/**
+ * 返回码
+ */
+export enum RESCODE {
+  SUCCESS = 200,
+  ERROR = 500,
+  COMMFAIL = 1001,
+  VALIDATEFAIL = 1002,
+  COREFAIL = 1003,
+  HANDLE_FAIL = 1004
+}
