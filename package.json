@@ -21,8 +21,9 @@
     "@midwayjs/upload": "^3.8.0",
     "@midwayjs/validate": "^3.8.0",
     "crypto-js": "^4.1.1",
+    "lodash": "^4.17.21",
     "mysql2": "^2.3.3",
-    "nanoid": "^4.0.0",
+    "nanoid": "^3.1.12",
     "passport-jwt": "^4.0.0",
     "typeorm": "^0.3.10"
   },
@@ -30,6 +31,7 @@
     "@midwayjs/cli": "^2.0.0",
     "@midwayjs/mock": "^3.0.0",
     "@types/jest": "^29.2.0",
+    "@types/jsonwebtoken": "^8.5.9",
     "@types/koa": "^2.13.4",
     "@types/node": "14",
     "cross-env": "^6.0.0",

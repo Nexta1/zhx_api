@@ -15,6 +15,7 @@ import * as i18n from '@midwayjs/i18n'
 import * as redis from '@midwayjs/redis'
 // eslint-disable-next-line node/no-unpublished-import
 import 'tsconfig-paths/register'
+import * as captcha from '@midwayjs/captcha'
 
 @Configuration({
   imports: [
@@ -27,6 +28,7 @@ import 'tsconfig-paths/register'
     passport,
     i18n,
     redis,
+    captcha,
     {
       component: info,
       enabledEnvironment: ['local']

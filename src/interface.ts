@@ -5,6 +5,6 @@
  */
 export interface ResponseResult {
   data?: any
-  code: number
+  code?: number
   message?: string
 }

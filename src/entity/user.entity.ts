@@ -14,4 +14,7 @@ export class UserEntity extends BaseEntity {
 
   @Column({ type: 'varchar', comment: '密码' })
   password: string
+
+  @Column({ length: 32 })
+  salt: string
 }
