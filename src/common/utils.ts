@@ -2,6 +2,48 @@ import * as CryptoJS from 'crypto-js'
 import { Config, Inject, Provide, Scope, ScopeEnum } from '@midwayjs/decorator'
 import { customAlphabet, nanoid } from 'nanoid'
 import { JwtService } from '@midwayjs/jwt'
+import { ResponseResult } from '@/interface'
+import { RESCODE } from '@/constant/global'
+import BaseErrorCode from '@/exception/base.error'
+import SystemErrorCode from '@/exception/system.error'
+export function res(op?: ResponseResult): ResponseResult {
+  return {
+    data: op?.data ?? null,
+    code: op?.code ?? RESCODE.SUCCESS,
+    message: op?.code
+      ? errorMessage(op!.code) || op?.message || 'unknown error'
+      : op?.message || 'success'
+  }
+}
+export function resByPage<V>(
+  list: V,
+  total: number,
+  page: number,
+  size: number
+): ResponseResult {
+  return res({
+    data: {
+      list,
+      pagination: {
+        total,
+        page,
+        size
+      }
+    }
+  })
+}
+
+/**
+ * 根据code获取错误信息
+ */
+export function errorMessage(code: number): string {
+  let errorCode = BaseErrorCode[code]
+  if (!errorCode) {
+    errorCode = SystemErrorCode[code]
+  }
+  // todo
+  return errorCode
+}
 @Provide()
 @Scope(ScopeEnum.Singleton)
 export class Utils {

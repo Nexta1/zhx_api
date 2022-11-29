@@ -1,5 +1,6 @@
 import { MidwayConfig } from '@midwayjs/core'
-import { UserEntity } from '@/entity/user.entity'
+// import { UserEntity } from '@/entity/sys/user.entity'
+// import SysRole from '@/entity/sys/role.entity'
 
 export default {
   // use for cookie sign key, should change to your own and keep security
@@ -23,11 +24,11 @@ export default {
         username: 'my',
         password: '2KJdPLSBCGXkKmHy',
         database: 'my',
-        synchronize: false, // 如果第一次使用，不存在表，有同步的需求可以写 true
+        synchronize: true, // 如果第一次使用，不存在表，有同步的需求可以写 true
         logging: false,
         // 配置实体模型 或者 entities: '/entity',
         // entities: [Photo],
-        entities: [UserEntity]
+        entities: '/entity'
       }
     }
   }

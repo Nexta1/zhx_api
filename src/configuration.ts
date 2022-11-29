@@ -16,6 +16,7 @@ import * as redis from '@midwayjs/redis'
 // eslint-disable-next-line node/no-unpublished-import
 import 'tsconfig-paths/register'
 import * as captcha from '@midwayjs/captcha'
+import { AuthMiddleware } from '@/middleware/auth.middleware'
 
 @Configuration({
   imports: [
@@ -42,7 +43,7 @@ export class ContainerLifeCycle {
 
   async onReady() {
     // add middleware
-    this.app.useMiddleware([])
+    this.app.useMiddleware([AuthMiddleware])
     // add filter
     this.app.useFilter([NotFoundFilter, DefaultErrorFilter])
   }

@@ -4,11 +4,11 @@ import { Validate } from '@midwayjs/validate'
 import { LoginInfoDto, UserDTO } from '@/dto/user.dto'
 import { UserService } from '@/service/user.service'
 import { BaseController } from '@/controller/base.controller'
-import { VerifyService } from '@/service/common/verify.service'
+import { VerifyService } from '@/service/admin/common/verify.service'
 import { isEmpty } from 'lodash'
 import { ResponseResult } from '@/interface'
 @Controller('/')
-export class UserController extends BaseController {
+export class LoginController extends BaseController {
   @Inject()
   userService: UserService
   @Inject()

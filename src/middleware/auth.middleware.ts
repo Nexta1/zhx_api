@@ -2,8 +2,9 @@
 
 import { Inject, Middleware } from '@midwayjs/decorator'
 import { Context, NextFunction } from '@midwayjs/koa'
-import { httpError } from '@midwayjs/core'
 import { JwtService } from '@midwayjs/jwt'
+import { res } from '@/common/utils'
+import { ResponseResult } from '@/interface'
 
 @Middleware()
 export class AuthMiddleware {
@@ -16,19 +17,19 @@ export class AuthMiddleware {
 
   resolve() {
     return async (ctx: Context, next: NextFunction) => {
+      console.log(ctx.url)
       // 判断下有没有校验信息
       if (!ctx.headers['authorization']) {
-        throw new httpError.UnauthorizedError()
+        this.reject(ctx, { code: 11001 })
+        return
       }
       // 从 header 上获取校验信息
       const parts = ctx.get('authorization').trim().split(' ')
-
       if (parts.length !== 2) {
-        throw new httpError.UnauthorizedError()
+        this.reject(ctx, { code: 11001 })
+        return
       }
-
       const [scheme, token] = parts
-
       if (/^Bearer$/i.test(scheme)) {
         try {
           //jwt.verify方法验证token是否有效
@@ -40,6 +41,8 @@ export class AuthMiddleware {
           // const newToken = getToken(user)
           //将新token放入Authorization中返回给前端
           // ctx.set('Authorization', newToken)
+          this.reject(ctx, { code: 11001 })
+          return
         }
         await next()
       }
@@ -47,8 +50,16 @@ export class AuthMiddleware {
   }
 
   // 配置忽略鉴权的路由地址
-  public match(ctx: Context): boolean {
-    const ignore = ctx.path.indexOf('/api/admin/login') !== -1
-    return !ignore
+  ignore(ctx: Context): boolean {
+    return (
+      ctx.path === '/get_captcha' ||
+      ctx.path === '/register' ||
+      ctx.path === '/login'
+    )
+  }
+
+  reject(ctx: Context, op: ResponseResult): void {
+    ctx.status = 200
+    ctx.body = res(op)
   }
 }

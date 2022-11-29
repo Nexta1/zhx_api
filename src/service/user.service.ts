@@ -1,6 +1,6 @@
 import { Inject, Provide } from '@midwayjs/decorator'
 import { InjectEntityModel } from '@midwayjs/typeorm'
-import { UserEntity } from '@/entity/user.entity'
+import { UserEntity } from '@/entity/sys/user.entity'
 import { Repository } from 'typeorm'
 import { UserDTO } from '@/dto/user.dto'
 import { Context } from '@midwayjs/koa'

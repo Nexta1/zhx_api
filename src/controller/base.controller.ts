@@ -57,7 +57,23 @@ export class BaseController {
         : op?.message || 'success'
     }
   }
-
+  resByPage<V>(
+    list: V,
+    total: number,
+    page: number,
+    size: number
+  ): ResponseResult {
+    return this.res({
+      data: {
+        list,
+        pagination: {
+          total,
+          page,
+          size
+        }
+      }
+    })
+  }
   /**
    * ❌
    * @param code

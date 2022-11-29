@@ -1,6 +1,6 @@
 import { Inject, Provide } from '@midwayjs/decorator'
 import { CaptchaService } from '@midwayjs/captcha'
-import { UserEntity } from '@/entity/user.entity'
+import { UserEntity } from '@/entity/sys/user.entity'
 import { Repository } from 'typeorm'
 import { isEmpty } from 'lodash'
 import { Utils } from '@/common/utils'

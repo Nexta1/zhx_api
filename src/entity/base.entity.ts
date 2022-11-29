@@ -7,7 +7,7 @@ export abstract class BaseEntity {
     name: 'create_time',
     comment: '创建时间'
   })
-  createTime: Date | null
+  createTime: Date
 
   @UpdateDateColumn({
     type: 'timestamp',
@@ -15,5 +15,5 @@ export abstract class BaseEntity {
     name: 'update_time',
     comment: '更新时间'
   })
-  updateTime: Date | null
+  updateTime: Date
 }

@@ -6,15 +6,17 @@ export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number
 
-  @Column({ type: 'varchar', comment: '用户名' })
+  @Column('varchar', { comment: '用户名', unique: true, length: 20 })
   username: string
 
-  @Column({ type: 'varchar', nullable: true, comment: '备注' })
+  @Column({ nullable: true, comment: '备注' })
   description: string
 
-  @Column({ type: 'varchar', comment: '密码' })
+  @Column({ comment: '密码' })
   password: string
 
   @Column({ length: 32 })
   salt: string
+  @Column({ name: 'department_id', nullable: true })
+  departmentId: number
 }
