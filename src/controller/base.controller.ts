@@ -4,11 +4,12 @@ import { ResponseResult } from '@/interface'
 import { RESCODE } from '@/constant/global'
 import BaseErrorCode from '@/exception/base.error'
 import SystemErrorCode from '@/exception/system.error'
-
+import { Context } from '@midwayjs/koa'
 export class BaseController {
   @Inject()
   utils: Utils
-
+  @Inject()
+  ctx: Context
   /**
    * 响应成功
    * @param data
@@ -50,7 +51,7 @@ export class BaseController {
    */
   res(op?: ResponseResult): ResponseResult {
     return {
-      data: op?.data ?? null,
+      data: op?.data,
       code: op?.code ?? RESCODE.SUCCESS,
       message: op?.code
         ? this.errorMessage(op!.code) || op?.message || 'unknown error'

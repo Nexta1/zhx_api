@@ -7,7 +7,7 @@ export default class SysRole extends BaseEntity {
   id: number
 
   @Column({ name: 'user_id' })
-  userId: string
+  userId: number
 
   @Column('varchar', { unique: true, length: 50 })
   name: string

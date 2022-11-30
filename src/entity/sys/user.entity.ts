@@ -17,6 +17,22 @@ export class UserEntity extends BaseEntity {
 
   @Column({ length: 32 })
   salt: string
+
   @Column({ name: 'department_id', nullable: true })
   departmentId: number
+
+  @Column({ name: 'nick_name', nullable: true })
+  nickName: string
+
+  @Column({ name: 'head_img', nullable: true })
+  headImg: string
+
+  @Column({ nullable: true })
+  email: string
+  @Column({ nullable: true })
+  phone: string
+  @Column({ nullable: true })
+  remark: string
+  @Column({ type: 'tinyint', nullable: true })
+  status: number
 }

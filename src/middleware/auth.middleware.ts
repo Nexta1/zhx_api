@@ -33,7 +33,7 @@ export class AuthMiddleware {
       if (/^Bearer$/i.test(scheme)) {
         try {
           //jwt.verify方法验证token是否有效
-          await this.jwtService.verify(token, {
+          ctx.state.user = await this.jwtService.verify(token, {
             complete: true
           })
         } catch (error) {
