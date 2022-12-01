@@ -7,9 +7,11 @@ import { Utils } from '@/common/utils'
 import { InjectEntityModel } from '@midwayjs/typeorm'
 import { IImageCaptchaResult } from '@/service/interface'
 import { MenuService } from '@/service/admin/sys/menu.service'
+import { RedisService } from '@midwayjs/redis'
+import { BaseService } from '@/service/base.service'
 
 @Provide()
-export class VerifyService {
+export class VerifyService extends BaseService {
   @Inject()
   captchaService: CaptchaService
   @Inject()
@@ -18,6 +20,8 @@ export class VerifyService {
   userModel: Repository<UserEntity>
   @Inject()
   utils: Utils
+  @Inject()
+  redisService: RedisService
 
   /**
    * 获取验证码
@@ -66,6 +70,8 @@ export class VerifyService {
     if (user.password !== comparePassword) {
       return null
     }
+    const perms = await this.menuService.getPermsByUid(user.id)
+    await this.redisService.set('admin:perms:' + user.id, JSON.stringify(perms))
     return this.utils.jwtSign(
       {
         uid: parseInt(user.id.toString())
@@ -76,9 +82,18 @@ export class VerifyService {
       }
     )
   }
+
+  /**
+   * 获取用户权限菜单
+   * @param uid
+   */
   async getPermsByUid(uid: number) {
     const menus = await this.menuService.getMenusByUid(uid)
     const perms = await this.menuService.getPermsByUid(uid)
     return { menus, perms }
+  }
+
+  async getPermsFromRedis(uid: number) {
+    return this.redisService.get('admin:perms:' + uid)
   }
 }

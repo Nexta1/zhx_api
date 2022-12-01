@@ -5,11 +5,15 @@ import { Context, NextFunction } from '@midwayjs/koa'
 import { JwtService } from '@midwayjs/jwt'
 import { res } from '@/common/utils'
 import { ResponseResult } from '@/interface'
+import { RedisService } from '@midwayjs/redis'
+import { isEmpty } from 'lodash'
 
 @Middleware()
 export class AuthMiddleware {
   @Inject()
   jwtService: JwtService
+  @Inject()
+  redisService: RedisService
 
   public static getName(): string {
     return 'jwt'
@@ -18,6 +22,7 @@ export class AuthMiddleware {
   resolve() {
     return async (ctx: Context, next: NextFunction) => {
       console.log(ctx.url)
+      const path = ctx.url.split('?')[0]
       // 判断下有没有校验信息
       if (!ctx.headers['authorization']) {
         this.reject(ctx, { code: 11001 })
@@ -37,12 +42,17 @@ export class AuthMiddleware {
             complete: true
           })
         } catch (error) {
-          //token过期 生成新的token
-          // const newToken = getToken(user)
-          //将新token放入Authorization中返回给前端
-          // ctx.set('Authorization', newToken)
-          this.reject(ctx, { code: 11001 })
-          return
+          return this.reject(ctx, { code: 11001 })
+        }
+        const perms = await this.redisService.get(
+          'admin:perms:' + ctx.state.user.payload.uid
+        )
+        if (!isEmpty(perms)) {
+          return this.reject(ctx, { code: 11001 })
+        }
+        const permsArray = JSON.parse(perms).map(r => r.replace(/:/g, '/'))
+        if (!permsArray.includes(path)) {
+          return this.reject(ctx, { code: 11003 })
         }
         await next()
       }

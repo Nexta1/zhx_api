@@ -29,10 +29,13 @@ export class UserEntity extends BaseEntity {
 
   @Column({ nullable: true })
   email: string
+
   @Column({ nullable: true })
   phone: string
+
   @Column({ nullable: true })
   remark: string
+
   @Column({ type: 'tinyint', nullable: true })
   status: number
 }

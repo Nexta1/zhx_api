@@ -6,7 +6,7 @@ import * as orm from '@midwayjs/typeorm'
 import { join } from 'path'
 import { DefaultErrorFilter } from './filter/default.filter'
 import { NotFoundFilter } from './filter/notfound.filter'
-
+import * as cache from '@midwayjs/cache'
 import * as swagger from '@midwayjs/swagger'
 import * as upload from '@midwayjs/upload'
 import * as jwt from '@midwayjs/jwt'
@@ -30,6 +30,7 @@ import { AuthMiddleware } from '@/middleware/auth.middleware'
     i18n,
     redis,
     captcha,
+    cache,
     {
       component: info,
       enabledEnvironment: ['local']
