@@ -6,15 +6,22 @@ import { isEmpty } from 'lodash'
 import { Utils } from '@/common/utils'
 import { InjectEntityModel } from '@midwayjs/typeorm'
 import { IImageCaptchaResult } from '@/service/interface'
+import { MenuService } from '@/service/admin/sys/menu.service'
 
 @Provide()
 export class VerifyService {
   @Inject()
   captchaService: CaptchaService
+  @Inject()
+  menuService: MenuService
   @InjectEntityModel(UserEntity)
   userModel: Repository<UserEntity>
   @Inject()
   utils: Utils
+
+  /**
+   * 获取验证码
+   */
   async getImageCaptcha(): Promise<IImageCaptchaResult> {
     const { id, imageBase64 } = await this.captchaService.image({
       size: 4,
@@ -29,6 +36,11 @@ export class VerifyService {
     }
   }
 
+  /**
+   * 检查验证码
+   * @param captchaId
+   * @param verifyCode
+   */
   async checkImgCaptcha(
     captchaId: string,
     verifyCode: string
@@ -36,6 +48,11 @@ export class VerifyService {
     return await this.captchaService.check(captchaId, verifyCode)
   }
 
+  /**
+   * 验证账号密码
+   * @param username
+   * @param password
+   */
   async getLoginSign(username: string, password: string): Promise<string> {
     const user = await this.userModel.findOne({
       where: {
@@ -49,7 +66,6 @@ export class VerifyService {
     if (user.password !== comparePassword) {
       return null
     }
-
     return this.utils.jwtSign(
       {
         uid: parseInt(user.id.toString())
@@ -59,5 +75,10 @@ export class VerifyService {
         expiresIn: '2d'
       }
     )
+  }
+  async getPermsByUid(uid: number) {
+    const menus = await this.menuService.getMenusByUid(uid)
+    const perms = await this.menuService.getPermsByUid(uid)
+    return { menus, perms }
   }
 }

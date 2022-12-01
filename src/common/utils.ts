@@ -6,6 +6,7 @@ import { ResponseResult } from '@/interface'
 import { RESCODE } from '@/constant/global'
 import BaseErrorCode from '@/exception/base.error'
 import SystemErrorCode from '@/exception/system.error'
+import { isEmpty, omit } from 'lodash'
 export function res(op?: ResponseResult): ResponseResult {
   return {
     data: op?.data ?? null,
@@ -106,8 +107,30 @@ export class Utils {
   jwtVerify(token: string, options?: any): any {
     return this.jwtService.signSync(token, this.jwt.secret, options)
   }
-  // 数组去重
+
+  /**
+   * 数组去重
+   * @param arr
+   */
   uniqueArray(arr) {
     return Array.from(new Set(arr))
+  }
+
+  /**
+   * 判断为空
+   * @param param
+   */
+  isEmpty(param) {
+    return isEmpty(param)
+  }
+
+  /**
+   * 过滤对象属性
+   * @param object
+   * @param props
+   * @constructor
+   */
+  OmitObject(object, ...props) {
+    return omit(object, [props])
   }
 }

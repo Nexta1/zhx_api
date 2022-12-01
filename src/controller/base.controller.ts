@@ -10,6 +10,9 @@ export class BaseController {
   utils: Utils
   @Inject()
   ctx: Context
+  uid(): number {
+    return this.ctx.state.user.payload.uid
+  }
   /**
    * 响应成功
    * @param data
