@@ -1,8 +1,14 @@
 import { Body, Controller, Get, Inject, Post } from '@midwayjs/decorator'
-import { UserService } from '@/service/user.service'
+import { UserService } from '@/service/admin/sys/user.service'
 import { BaseController } from '@/controller/base.controller'
 import { ResponseResult } from '@/interface'
-import { CreateUserDto } from '@/dto/user.dto'
+import {
+  CreateUserDto,
+  DeleteUserDto,
+  PageUserDto,
+  TransferUserDto,
+  UpdateUserDto
+} from '@/dto/admin/sys/user.dto'
 import { Validate } from '@midwayjs/validate'
 
 @Controller('/sys/user')
@@ -20,6 +26,37 @@ export class UserController extends BaseController {
     if (!res) {
       return this.res({ code: 10001 })
     }
+    return this.res()
+  }
+  @Post('/page')
+  @Validate()
+  async page(@Body() dto: PageUserDto): Promise<ResponseResult> {
+    const list = await this.userService.page(
+      this.uid(),
+      dto.departmentIds,
+      dto.page - 1,
+      dto.limit
+    )
+    const total = await this.userService.count(dto.departmentIds)
+    return this.resByPage(list, total, dto.page, dto.limit)
+  }
+  @Post('/transfer')
+  @Validate()
+  async transfer(@Body() param: TransferUserDto): Promise<ResponseResult> {
+    const { userIds, departmentId } = param
+    await this.userService.transfer(userIds, departmentId)
+    return this.res()
+  }
+  @Post('/update')
+  @Validate()
+  async update(@Body() param: UpdateUserDto): Promise<ResponseResult> {
+    await this.userService.update(param)
+    return this.res()
+  }
+  @Post('/delete')
+  @Validate()
+  async delete(@Body() param: DeleteUserDto): Promise<ResponseResult> {
+    await this.userService.delete(param.id)
     return this.res()
   }
 }

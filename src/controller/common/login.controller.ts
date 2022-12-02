@@ -1,8 +1,8 @@
 // src/controller/home.ts
 import { Body, Controller, Get, Inject, Post } from '@midwayjs/decorator'
 import { Validate } from '@midwayjs/validate'
-import { LoginInfoDto, UserDTO } from '@/dto/user.dto'
-import { UserService } from '@/service/user.service'
+import { LoginInfoDto, UserDTO } from '@/dto/admin/sys/user.dto'
+import { UserService } from '@/service/admin/sys/user.service'
 import { BaseController } from '@/controller/base.controller'
 import { VerifyService } from '@/service/admin/common/verify.service'
 import { isEmpty } from 'lodash'
