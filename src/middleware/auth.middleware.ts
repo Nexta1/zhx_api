@@ -21,8 +21,9 @@ export class AuthMiddleware {
 
   resolve() {
     return async (ctx: Context, next: NextFunction) => {
-      console.log(ctx.url)
+      console.log(ctx.url, '11')
       const path = ctx.url.split('?')[0]
+      console.log(path)
       // 判断下有没有校验信息
       if (!ctx.headers['authorization']) {
         this.reject(ctx, { code: 11001 })
