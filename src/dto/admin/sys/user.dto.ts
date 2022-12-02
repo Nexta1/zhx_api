@@ -1,5 +1,6 @@
 // src/dto/user.ts
 import { Rule, RuleType } from '@midwayjs/validate'
+import { PageSearchDto } from '@/dto/comm.dto'
 
 export class UserDTO {
   @Rule(RuleType.string().required())
@@ -9,7 +10,6 @@ export class UserDTO {
       .min(3)
       .max(20)
       .pattern(/^[a-z0-9A-Z]+$/)
-      .required()
   )
   password: string
 }
@@ -39,6 +39,10 @@ export class CreateUserDto extends UserDTO {
   @Rule(RuleType.number().integer().valid(0, 1).optional())
   status: number
 }
+export class UpdateUserDto extends CreateUserDto {
+  @Rule(RuleType.number().required().integer())
+  id: number
+}
 export class LoginInfoDto {
   @Rule(RuleType.string().required())
   username: string
@@ -48,4 +52,19 @@ export class LoginInfoDto {
   captchaId: string
   @Rule(RuleType.string().required())
   verifyCode: string
+}
+
+export class PageUserDto extends PageSearchDto {
+  @Rule(RuleType.array().items(RuleType.number()).min(1).optional())
+  departmentIds: number[]
+}
+export class TransferUserDto {
+  @Rule(RuleType.array().items(RuleType.number()).optional())
+  userIds: number[]
+  @Rule(RuleType.number().required())
+  departmentId: number
+}
+export class DeleteUserDto {
+  @Rule(RuleType.array().items(RuleType.number()).required())
+  id: number[]
 }

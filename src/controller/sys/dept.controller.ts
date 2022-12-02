@@ -9,6 +9,7 @@ import { CreateDeptDto, UpdateDeptDto } from '@/dto/admin/sys/dept.dto'
 export class DeptController extends BaseController {
   @Inject()
   dept: DeptService
+
   @Get('/list')
   async list(): Promise<ResponseResult> {
     console.log(this.ctx.state.user)

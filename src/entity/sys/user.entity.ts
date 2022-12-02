@@ -24,6 +24,9 @@ export class UserEntity extends BaseEntity {
   @Column({ name: 'nick_name', nullable: true })
   nickName: string
 
+  @Column({ nullable: true })
+  name: string
+
   @Column({ name: 'head_img', nullable: true })
   headImg: string
 

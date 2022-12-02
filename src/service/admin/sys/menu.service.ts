@@ -56,6 +56,7 @@ export class MenuService {
             'role_menu.role_id IN (:...roleIds)',
             { roleIds }
           )
+          .andWhere('menu.id=role_menu.id')
           .getMany()
     }
     return menus
@@ -72,7 +73,11 @@ export class MenuService {
       if (!isEmpty(roleIds))
         res = await this.menuModel
           .createQueryBuilder('menu')
-          .innerJoinAndSelect('sys_role_menu', 'role_menu')
+          .innerJoinAndSelect(
+            'sys_role_menu',
+            'role_menu',
+            'role_menu.role_id=menu.id'
+          )
           .where('role_menu.role_id IN (:...roleIds)', { roleIds })
           .andWhere('menu.type = 2')
           .andWhere('menu.perms IS NOT NULL')

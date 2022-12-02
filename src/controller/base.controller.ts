@@ -61,6 +61,14 @@ export class BaseController {
         : op?.message || 'success'
     }
   }
+
+  /**
+   * 分頁
+   * @param list
+   * @param total
+   * @param page
+   * @param size
+   */
   resByPage<V>(
     list: V,
     total: number,

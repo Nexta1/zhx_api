@@ -6,7 +6,7 @@ import { ResponseResult } from '@/interface'
 import { RESCODE } from '@/constant/global'
 import BaseErrorCode from '@/exception/base.error'
 import SystemErrorCode from '@/exception/system.error'
-import { isEmpty, omit } from 'lodash'
+import { isEmpty } from 'lodash'
 export function res(op?: ResponseResult): ResponseResult {
   return {
     data: op?.data ?? null,
@@ -45,6 +45,7 @@ export function errorMessage(code: number): string {
   // todo
   return errorCode
 }
+
 @Provide()
 @Scope(ScopeEnum.Singleton)
 export class Utils {
@@ -122,15 +123,5 @@ export class Utils {
    */
   isEmpty(param) {
     return isEmpty(param)
-  }
-
-  /**
-   * 过滤对象属性
-   * @param object
-   * @param props
-   * @constructor
-   */
-  OmitObject(object, ...props) {
-    return omit(object, [props])
   }
 }
