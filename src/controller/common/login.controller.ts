@@ -7,27 +7,31 @@ import { BaseController } from '@/controller/base.controller'
 import { VerifyService } from '@/service/admin/common/verify.service'
 import { isEmpty } from 'lodash'
 import { ResponseResult } from '@/interface'
+
 @Controller('/')
 export class LoginController extends BaseController {
   @Inject()
   userService: UserService
   @Inject()
-  VerifyService: VerifyService
+  verifyService: VerifyService
+
   @Post('/register')
   @Validate()
   async createUser(@Body() user: UserDTO) {
     const res = await this.userService.createUser(user)
     return this.handle(res)
   }
+
   @Get('/get_captcha')
   async captchaByImg(): Promise<ResponseResult> {
-    const result = await this.VerifyService.getImageCaptcha()
+    const result = await this.verifyService.getImageCaptcha()
     return this.res({ data: result })
   }
+
   @Post('/login')
   @Validate()
   async login(@Body() loginInfo: LoginInfoDto): Promise<ResponseResult> {
-    const isSuccess = await this.VerifyService.checkImgCaptcha(
+    const isSuccess = await this.verifyService.checkImgCaptcha(
       loginInfo.captchaId,
       loginInfo.verifyCode
     )
@@ -35,7 +39,7 @@ export class LoginController extends BaseController {
       return this.res({ code: 1002 })
     }
     const { password, username } = loginInfo
-    const res = await this.VerifyService.getLoginSign(username, password)
+    const res = await this.verifyService.getLoginSign(username, password)
     if (isEmpty(res)) {
       return this.res({ code: 10003 })
     }

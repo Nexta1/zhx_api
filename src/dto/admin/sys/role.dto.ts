@@ -1,10 +1,5 @@
 import { Rule, RuleType } from '@midwayjs/validate'
 
-export class DeleteRoleDto {
-  @Rule(RuleType.array().items(RuleType.number()).min(1))
-  roleIds: number[]
-}
-
 export class CreateRoleDto {
   @Rule(RuleType.string().min(2).required())
   name: string
@@ -35,4 +30,9 @@ export class UpdateRoleDto extends CreateRoleDto {
 export class InfoRoleDto {
   @Rule(RuleType.number().integer().required())
   roleId: number
+}
+
+export class DeleteRoleDto {
+  @Rule(RuleType.array().items(RuleType.number()).required())
+  roleId: number[]
 }

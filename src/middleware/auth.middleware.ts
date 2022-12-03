@@ -6,7 +6,6 @@ import { JwtService } from '@midwayjs/jwt'
 import { res } from '@/common/utils'
 import { ResponseResult } from '@/interface'
 import { RedisService } from '@midwayjs/redis'
-import { isEmpty } from 'lodash'
 
 @Middleware()
 export class AuthMiddleware {
@@ -21,7 +20,6 @@ export class AuthMiddleware {
 
   resolve() {
     return async (ctx: Context, next: NextFunction) => {
-      console.log(ctx.url, '11')
       const path = ctx.url.split('?')[0]
       console.log(path)
       // 判断下有没有校验信息
@@ -45,16 +43,17 @@ export class AuthMiddleware {
         } catch (error) {
           return this.reject(ctx, { code: 11001 })
         }
-        const perms = await this.redisService.get(
-          'admin:perms:' + ctx.state.user.payload.uid
-        )
-        if (!isEmpty(perms)) {
-          return this.reject(ctx, { code: 11001 })
-        }
-        const permsArray = JSON.parse(perms).map(r => r.replace(/:/g, '/'))
-        if (!permsArray.includes(path)) {
-          return this.reject(ctx, { code: 11003 })
-        }
+        // const perms = await this.redisService.get(
+        //   'admin:perms:' + ctx.state.user.payload.uid
+        // )
+        //
+        // if (!isEmpty(perms)) {
+        //   return this.reject(ctx, { code: 11001 })
+        // }
+        // const permsArray = JSON.parse(perms).map(r => r.replace(/:/g, '/'))
+        // if (!permsArray.includes(path)) {
+        //   return this.reject(ctx, { code: 11003 })
+        // }
         await next()
       }
     }

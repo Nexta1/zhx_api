@@ -8,6 +8,7 @@ import { BaseService } from '@/service/base.service'
 import SysUserRole from '@/entity/sys/user_role.entity'
 import { findIndex, isEmpty, omit } from 'lodash'
 import { IPageSearchUserResult } from '@/interface'
+
 @Provide()
 export class UserService extends BaseService {
   @InjectEntityModel(UserEntity)
@@ -54,9 +55,15 @@ export class UserService extends BaseService {
     })
     return true
   }
+
+  /**
+   * 查询数量
+   * @param deptIds
+   */
   async count(deptIds: number[]) {
     return await this.userModel.count({ where: { departmentId: In(deptIds) } })
   }
+
   /**
    * 轉移部門
    * @param userIds
@@ -65,6 +72,7 @@ export class UserService extends BaseService {
   async transfer(userIds: number[], deptId: number) {
     await this.userModel.update({ id: In(userIds) }, { departmentId: deptId })
   }
+
   /**
    *根據部門id獲取用戶
    * @param uid
@@ -121,6 +129,7 @@ export class UserService extends BaseService {
     })
     return dealResult
   }
+
   // save
   async createUser(params: UserDTO): Promise<boolean> {
     const salt = this.utils.generateRandomValue(32)

@@ -1,7 +1,7 @@
 import { Config, Inject, Provide } from '@midwayjs/decorator'
 import { InjectEntityModel } from '@midwayjs/typeorm'
 import SysRole from '@/entity/sys/role.entity'
-import { Not, Repository } from 'typeorm'
+import { In, Not, Repository } from 'typeorm'
 import { CreateRoleDto, UpdateRoleDto } from '@/dto/admin/sys/role.dto'
 import SysRoleMenu from '@/entity/sys/role_menu.entity'
 import SysRoleDepartment from '@/entity/sys/role_dept.entity'
@@ -26,12 +26,14 @@ export class RoleService extends BaseService {
   utils: Utils
   @Config('superRoleId')
   superRoleId: number
+
   /**
    * 查询系统角色
    */
   async list(): Promise<SysRole[]> {
     return await this.roleModel.find()
   }
+
   /**
    * 增加系统角色
    * @param param
@@ -106,29 +108,46 @@ export class RoleService extends BaseService {
   async count(): Promise<number> {
     return await this.roleModel.count({ where: { id: Not(this.superRoleId) } })
   }
-  async update(param: UpdateRoleDto) {
+
+  /**
+   * 更新角色
+   * @param param
+   */
+  async update(param: UpdateRoleDto): Promise<SysRole> {
     const { roleId, name, label, remark, menus, depts } = param
-    const role = await this.roleModel.save({ id: roleId, name, label, remark })
-    const originDeptRows = await this.roleDepartment.find({ where: { roleId } })
-    const originMenuRows = await this.roleMenu.find({ where: { roleId } })
-    const originMenuIds = originMenuRows.map(e => {
+    const role: {
+      name: string
+      remark: string
+      id: number
+      label: string
+    } & SysRole = await this.roleModel.save({ id: roleId, name, label, remark })
+    const originDeptRows: SysRoleDepartment[] = await this.roleDepartment.find({
+      where: { roleId }
+    })
+    const originMenuRows: SysRoleMenu[] = await this.roleMenu.find({
+      where: { roleId }
+    })
+    const originMenuIds: number[] = originMenuRows.map(e => {
       return e.menuId
     })
-    const originDeptIds = originDeptRows.map(e => {
+    const originDeptIds: number[] = originDeptRows.map(e => {
       return e.departmentId
     })
-    const insertMenuRowIds = difference(menus, originMenuIds)
-    const deleteMenuRowIds = difference(originMenuIds, menus)
-    const insertDeptIds = difference(depts, originDeptIds)
-    const deleteDeptIds = difference(originDeptIds, depts)
-    await this.getManager().transaction(async manager => {
+    const insertMenuRowIds: number[] = difference(menus, originMenuIds)
+    const deleteMenuRowIds: number[] = difference(originMenuIds, menus)
+    const insertDeptIds: number[] = difference(depts, originDeptIds)
+    const deleteDeptIds: number[] = difference(originDeptIds, depts)
+    await this.getManager().transaction(async (manager): Promise<void> => {
       if (insertMenuRowIds.length > 0) {
-        const insertRows = map(insertMenuRowIds, menuId => {
-          return {
-            roleId,
-            menuId
+        const insertRows: { roleId: number; menuId: number }[] = map(
+          insertMenuRowIds,
+          menuId => {
+            return {
+              roleId,
+              menuId
+            }
           }
-        })
+        )
         await manager
           .getRepository(SysRoleMenu)
           .createQueryBuilder('role_menu')
@@ -136,12 +155,44 @@ export class RoleService extends BaseService {
           .values(insertRows)
           .execute()
       }
-      //todo
-    //   if (deleteMenuRowIds.length > 0) {
-    //     const deleteRows = filter(originMenuRows, e => {
-    //       includes(deleteMenuRowIds, e.menuId)
-    //     }).map(r => r.id)
-    //   }
-    // })
+      if (deleteMenuRowIds.length > 0) {
+        const deleteRowIds = filter(originMenuRows, (e): boolean => {
+          return includes(deleteMenuRowIds, e.menuId)
+        }).map(r => r.id)
+        await manager.delete(SysRoleMenu, deleteRowIds)
+      }
+      if (insertDeptIds.length > 0) {
+        const insertRows = map(insertDeptIds, departmentId => {
+          return {
+            roleId,
+            departmentId
+          }
+        })
+        await manager.insert(SysRoleDepartment, insertRows)
+      }
+      if (deleteDeptIds.length > 0) {
+        const deleteRowIds: number[] = filter(originDeptRows, e => {
+          return includes(deleteDeptIds, e.departmentId)
+        }).map(r => r.id)
+        await manager.delete(SysRoleDepartment, deleteRowIds)
+      }
+    })
+    return role
+  }
+
+  async delete(roleIds: number[]) {
+    if (roleIds.includes(this.superRoleId)) {
+      throw new Error('不能删除超级管理员')
+    }
+    await this.getManager().transaction(async manager => {
+      await manager.delete(SysRole, { id: In(roleIds) })
+      await manager.delete(SysRoleMenu, { roleId: In(roleIds) })
+      await manager.delete(SysRoleDepartment, { roleId: In(roleIds) })
+      //todo 删除用户
+    })
+  }
+
+  async countRoleByRoleIds(roleIds: number[]): Promise<number> {
+    return await this.userRole.count({ where: { roleId: In(roleIds) } })
   }
 }
