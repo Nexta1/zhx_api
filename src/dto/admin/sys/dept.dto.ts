@@ -9,7 +9,13 @@ export class CreateDeptDto {
   @Rule(RuleType.number().integer().min(0))
   orderNum: number
 }
+
 export class UpdateDeptDto extends CreateDeptDto {
+  @Rule(RuleType.number().integer().required())
+  id: number
+}
+
+export class DeleteDeptDto {
   @Rule(RuleType.number().integer().required())
   id: number
 }

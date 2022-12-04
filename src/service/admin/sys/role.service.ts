@@ -180,6 +180,10 @@ export class RoleService extends BaseService {
     return role
   }
 
+  /**
+   * 删除用户
+   * @param roleIds
+   */
   async delete(roleIds: number[]) {
     if (roleIds.includes(this.superRoleId)) {
       throw new Error('不能删除超级管理员')

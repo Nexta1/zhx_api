@@ -103,8 +103,8 @@ export class UpdateMenuDto extends CreateMenuDto {
  * 删除菜单
  */
 export class DeleteMenuDto {
-  @Rule(RuleType.number().integer().required())
-  menuId: number
+  @Rule(RuleType.array().items(RuleType.number().integer()).required())
+  menuId: number[]
 }
 
 /**

@@ -1,10 +1,18 @@
 import { InjectEntityModel } from '@midwayjs/typeorm'
 import SysMenu from '@/entity/sys/menu.entity'
-import { IsNull, Not, Repository } from 'typeorm'
-import { CreateMenuDto } from '@/dto/admin/sys/menu.dto'
+import { In, IsNull, Not, Repository } from 'typeorm'
+import { CreateMenuDto, UpdateMenuDto } from '@/dto/admin/sys/menu.dto'
 import { Config, Inject, Provide } from '@midwayjs/decorator'
 import { RoleService } from '@/service/admin/sys/role.service'
-import { concat, includes, isEmpty, uniq } from 'lodash'
+import {
+  concat,
+  filter,
+  flattenDeep,
+  includes,
+  isEmpty,
+  map,
+  uniq
+} from 'lodash'
 
 @Provide()
 export class MenuService {
@@ -26,7 +34,9 @@ export class MenuService {
    * 保存更新
    * @param menu
    */
-  async save(menu: CreateMenuDto): Promise<CreateMenuDto> {
+  async save(
+    menu: CreateMenuDto | UpdateMenuDto
+  ): Promise<CreateMenuDto | UpdateMenuDto> {
     return await this.menuModel.save(menu)
   }
 
@@ -100,5 +110,30 @@ export class MenuService {
       perms = uniq(perms)
     }
     return perms
+  }
+
+  /**
+   * 删除菜单
+   * @param menuIds
+   */
+  async delete(menuIds: number[]) {
+    await this.menuModel.delete(menuIds)
+  }
+
+  /**
+   * 查询子菜单
+   * @param menuIds
+   */
+  async searchChildMenus(menuIds: number[]) {
+    const deleteMenuIds = [].concat(menuIds)
+    const menus = await this.menuModel.find({
+      where: { parentId: In(menuIds) }
+    })
+    const ids = map(filter(menus, ['type', 0]), 'id')
+    deleteMenuIds.push(map(menus, 'id'))
+    if (!isEmpty(ids)) {
+      deleteMenuIds.push(await this.searchChildMenus(ids))
+    }
+    return uniq(flattenDeep(deleteMenuIds))
   }
 }
