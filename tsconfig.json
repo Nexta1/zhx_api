@@ -16,8 +16,9 @@
     "forceConsistentCasingInFileNames": true,
     "typeRoots": ["./typings", "./node_modules/@types"],
     "outDir": "dist",
+    "baseUrl": "./",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["src/*"]
     }
   },
   "exclude": ["dist", "node_modules", "test"]
