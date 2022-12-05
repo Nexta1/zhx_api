@@ -22,7 +22,7 @@ export default {
         host: '119.91.63.89',
         port: 3306,
         username: 'my',
-        password: '2KJdPLSBCGXkKmHy',
+        password: '798868370',
         database: 'my',
         synchronize: false, // 如果第一次使用，不存在表，有同步的需求可以写 true
         logging: false,
@@ -35,17 +35,9 @@ export default {
   redis: {
     client: {
       port: 6379, // Redis port
-      host: '127.0.0.1', // Redis host
-      password: '',
+      host: '119.91.63.89', // Redis host
+      password: '798868370',
       db: 0
     }
   }
-  // redis: {
-  //   client: {
-  //     port: 6379, // Redis port
-  //     host: '119.91.63.89', // Redis host
-  //     password: '798868370',
-  //     db: 0
-  //   }
-  // }
 } as MidwayConfig

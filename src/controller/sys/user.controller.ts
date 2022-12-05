@@ -10,11 +10,14 @@ import {
   UpdateUserDto
 } from '@/dto/admin/sys/user.dto'
 import { Validate } from '@midwayjs/validate'
+import { MenuService } from '@/service/admin/sys/menu.service'
 
 @Controller('/sys/user')
 export class UserController extends BaseController {
   @Inject()
   userService: UserService
+  @Inject()
+  menuService: MenuService
   @Get('/list')
   async list(): Promise<ResponseResult> {
     return this.res({ data: await this.userService.list() })
@@ -51,6 +54,7 @@ export class UserController extends BaseController {
   @Validate()
   async update(@Body() param: UpdateUserDto): Promise<ResponseResult> {
     await this.userService.update(param)
+    await this.menuService.refreshPerms(param.id)
     return this.res()
   }
   @Post('/delete')

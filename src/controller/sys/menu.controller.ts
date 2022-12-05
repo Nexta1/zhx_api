@@ -41,6 +41,10 @@ export class MenuController extends BaseController {
     if (menuDto.parentId === -1) {
       menuDto.parentId = undefined
     }
+    if (menuDto.type === 2) {
+      // 如果是权限发生更改，则刷新所有在线用户的权限
+      await this.menuService.refreshOnlineUserPerms()
+    }
     await this.menuService.save(menuDto)
     return this.res()
   }
@@ -66,6 +70,10 @@ export class MenuController extends BaseController {
     if (menuDto.parentId === -1) {
       menuDto.parentId = undefined
     }
+    if (menuDto.type === 2) {
+      // 如果是权限发生更改，则刷新所有在线用户的权限
+      await this.menuService.refreshOnlineUserPerms()
+    }
     await this.menuService.save(menuDto)
     return this.res()
   }
@@ -75,6 +83,7 @@ export class MenuController extends BaseController {
   async delete(@Body() param: DeleteMenuDto) {
     const deleteIds = await this.menuService.searchChildMenus(param.menuId)
     await this.menuService.delete(deleteIds)
+    await this.menuService.refreshOnlineUserPerms()
     return this.res({
       data: deleteIds
     })

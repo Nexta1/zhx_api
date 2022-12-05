@@ -9,12 +9,14 @@ import {
 } from '@/dto/admin/sys/role.dto'
 import { Validate } from '@midwayjs/validate'
 import { PageSearchDto } from '@/dto/comm.dto'
+import { MenuService } from '@/service/admin/sys/menu.service'
 
 @Controller('/sys/role')
 export class RoleController extends BaseController {
   @Inject()
   roleService: RoleService
-
+  @Inject()
+  menuService: MenuService
   @Get('/list')
   async list(): Promise<ResponseResult> {
     return this.res({ data: await this.roleService.list() })
@@ -41,6 +43,7 @@ export class RoleController extends BaseController {
   @Post('/update')
   @Validate()
   async update(@Body() param: UpdateRoleDto): Promise<ResponseResult> {
+    await this.menuService.refreshOnlineUserPerms()
     return this.res({ data: await this.roleService.update(param) })
   }
 
@@ -53,6 +56,7 @@ export class RoleController extends BaseController {
       return this.res({ code: 10008 })
     }
     await this.roleService.delete(param.roleId)
+    await this.menuService.refreshOnlineUserPerms()
     return this.res()
   }
 }

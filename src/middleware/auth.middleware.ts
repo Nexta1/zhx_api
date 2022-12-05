@@ -6,6 +6,7 @@ import { JwtService } from '@midwayjs/jwt'
 import { res } from '@/common/utils'
 import { ResponseResult } from '@/interface'
 import { RedisService } from '@midwayjs/redis'
+import { isEmpty } from 'lodash'
 
 @Middleware()
 export class AuthMiddleware {
@@ -34,28 +35,38 @@ export class AuthMiddleware {
         return
       }
       const [scheme, token] = parts
-      if (/^Bearer$/i.test(scheme)) {
-        try {
-          //jwt.verify方法验证token是否有效
-          ctx.state.user = await this.jwtService.verify(token, {
-            complete: true
-          })
-        } catch (error) {
-          return this.reject(ctx, { code: 11001 })
-        }
-        // const perms = await this.redisService.get(
-        //   'admin:perms:' + ctx.state.user.payload.uid
-        // )
-        //
-        // if (!isEmpty(perms)) {
-        //   return this.reject(ctx, { code: 11001 })
-        // }
-        // const permsArray = JSON.parse(perms).map(r => r.replace(/:/g, '/'))
-        // if (!permsArray.includes(path)) {
-        //   return this.reject(ctx, { code: 11003 })
-        // }
-        await next()
+      if (!/^Bearer$/i.test(scheme)) {
+        return this.reject(ctx, { code: 11001 })
       }
+      try {
+        //jwt.verify方法验证token是否有效
+        ctx.state.user = await this.jwtService.verify(token, {
+          complete: true
+        })
+      } catch (error) {
+        return this.reject(ctx, { code: 11001 })
+      }
+      const perms = await this.redisService.get(
+        'admin:perms:' + ctx.state.user.payload.uid
+      )
+      const pv = await this.redisService.get(
+        `admin:passwordVersion:${ctx.state.user.payload.uid}`
+      )
+      if (!ctx.state.user) {
+        return this.reject(ctx, { code: 11001 })
+      }
+      if (pv !== ctx.state.user.payload.pv) {
+        // 密码版本不一致，登录期间已更改过密码
+        this.reject(ctx, { code: 11002 })
+      }
+      if (!isEmpty(perms)) {
+        return this.reject(ctx, { code: 11001 })
+      }
+      const permsArray = JSON.parse(perms).map(r => r.replace(/:/g, '/'))
+      if (!permsArray.includes(path)) {
+        return this.reject(ctx, { code: 11003 })
+      }
+      await next()
     }
   }
 

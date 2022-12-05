@@ -70,18 +70,20 @@ export class VerifyService extends BaseService {
     if (user.password !== comparePassword) {
       return null
     }
-    const perms = await this.menuService.getPermsByUid(user.id)
-    console.log(perms)
-    await this.redisService.set('admin:perms:' + user.id, JSON.stringify(perms))
-    return this.utils.jwtSign(
+    const jwtSign = this.utils.jwtSign(
       {
-        uid: parseInt(user.id.toString())
-        // pv: 1,
+        uid: parseInt(user.id.toString()),
+        pv: 1
       },
       {
         expiresIn: '2d'
       }
     )
+    const perms = await this.menuService.getPermsByUid(user.id)
+    await this.redisService.set('admin:pv:' + user.id, 1)
+    await this.redisService.set(`admin:token:` + user.id, jwtSign)
+    await this.redisService.set('admin:perms:' + user.id, JSON.stringify(perms))
+    return jwtSign
   }
 
   /**
@@ -94,7 +96,4 @@ export class VerifyService extends BaseService {
     return { menus, perms }
   }
 
-  async getPermsFromRedis(uid: number) {
-    return this.redisService.get('admin:perms:' + uid)
-  }
 }

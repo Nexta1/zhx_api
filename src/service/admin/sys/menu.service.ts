@@ -13,6 +13,7 @@ import {
   map,
   uniq
 } from 'lodash'
+import { RedisService } from '@midwayjs/redis'
 
 @Provide()
 export class MenuService {
@@ -22,7 +23,8 @@ export class MenuService {
   roleService: RoleService
   @Config('superRoleId')
   superRoleId: number
-
+  @Inject()
+  redisService: RedisService
   /**
    * 获取所有菜单
    */
@@ -135,5 +137,31 @@ export class MenuService {
       deleteMenuIds.push(await this.searchChildMenus(ids))
     }
     return uniq(flattenDeep(deleteMenuIds))
+  }
+  /**
+   * 刷新指定用户ID的权限
+   */
+  async refreshPerms(uid: number): Promise<void> {
+    const perms = await this.getPermsByUid(uid)
+    const online = await this.redisService.get(`admin:token:${uid}`)
+    if (online) {
+      // 判断是否在线
+      await this.redisService.set(`admin:perms:${uid}`, JSON.stringify(perms))
+    }
+  }
+  /**
+   * 刷新在线用户权限
+   */
+  async refreshOnlineUserPerms() {
+    const onlineUserIds: string[] = await this.redisService.keys(
+      'admin:token:*'
+    )
+    if (onlineUserIds && onlineUserIds.length > 0) {
+      for (const i in onlineUserIds) {
+        const uid = onlineUserIds[i].split('admin:token:')[1]
+        const perms = await this.getPermsByUid(Number(uid))
+        await this.redisService.set(`admin:perms:${uid}`, JSON.stringify(perms))
+      }
+    }
   }
 }

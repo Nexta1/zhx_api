@@ -68,3 +68,14 @@ export class DeleteUserDto {
   @Rule(RuleType.array().items(RuleType.number()).required())
   id: number[]
 }
+export class UpdatePassword {
+  @Rule(RuleType.string().required)
+  originPassword: string
+  @Rule(
+    RuleType.string()
+      .min(6)
+      .pattern(/^[a-z0-9A-Z`~!#%^&*=+\\|{};:'\\",<>/?]+$/)
+      .required()
+  )
+  newPassword: string
+}

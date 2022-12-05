@@ -2,12 +2,18 @@ import { Inject, Provide } from '@midwayjs/decorator'
 import { InjectEntityModel } from '@midwayjs/typeorm'
 import { UserEntity } from '@/entity/sys/user.entity'
 import { In, Repository } from 'typeorm'
-import { CreateUserDto, UpdateUserDto, UserDTO } from '@/dto/admin/sys/user.dto'
+import {
+  CreateUserDto,
+  UpdatePassword,
+  UpdateUserDto,
+  UserDTO
+} from '@/dto/admin/sys/user.dto'
 import { Utils } from '@/common/utils'
 import { BaseService } from '@/service/base.service'
 import SysUserRole from '@/entity/sys/user_role.entity'
 import { findIndex, isEmpty, omit } from 'lodash'
 import { IPageSearchUserResult } from '@/interface'
+import { RedisService } from '@midwayjs/redis'
 
 @Provide()
 export class UserService extends BaseService {
@@ -17,7 +23,8 @@ export class UserService extends BaseService {
   userRoleModel: Repository<SysUserRole>
   @Inject()
   utils: Utils
-
+  @Inject()
+  redisService: RedisService
   /**
    * 查询所有用户
    */
@@ -186,5 +193,56 @@ export class UserService extends BaseService {
   async delete(ids: number[]) {
     await this.userModel.delete(ids)
     await this.userRoleModel.delete({ userId: In(ids) })
+  }
+
+  /**
+   * 更该用户密码
+   * @param uid
+   * @param dto
+   */
+  async updatePassword(uid: number, dto: UpdatePassword) {
+    const user = await this.userModel.findOne({ where: { id: uid } })
+    if (isEmpty(user)) {
+      throw new Error('用户不存在')
+    }
+    const comparePassword = this.utils.md5(`${dto.originPassword}${user.salt}`)
+    if (user.password !== comparePassword) {
+      return false
+    }
+    const password = this.utils.md5(`${dto.newPassword}${user.salt}`)
+    await this.userModel.update({ id: uid }, { password })
+    await this.upgradePasswordVersion(uid)
+    return true
+  }
+
+  /**
+   * 强制更新密码
+   * @param uid
+   * @param password
+   */
+  async forceUpdatePassword(uid: number, password: string): Promise<boolean> {
+    const user: UserEntity = await this.userModel.findOne({
+      where: { id: uid }
+    })
+    if (isEmpty(user)) {
+      throw new Error('用户不存在')
+    }
+    const newPassword = this.utils.md5(`${password}${user.salt}`)
+    await this.userModel.update({ id: uid }, { password: newPassword })
+    await this.upgradePasswordVersion(uid)
+    return true
+  }
+  /**
+   * 更新redis密码版本
+   * @param id
+   */
+  async upgradePasswordVersion(id: number) {
+    const version = await this.redisService.get(`admin:passwordVersion:${id}}`)
+    if (!isEmpty(version)) {
+      await this.redisService.set(
+        `admin:passwordVersion:${id}}`,
+        parseInt(version) + 1
+      )
+    }
   }
 }
