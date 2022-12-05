@@ -6,6 +6,7 @@ import {
   CreateUserDto,
   DeleteUserDto,
   PageUserDto,
+  PasswordUserDto,
   TransferUserDto,
   UpdateUserDto
 } from '@/dto/admin/sys/user.dto'
@@ -55,6 +56,12 @@ export class UserController extends BaseController {
   async update(@Body() param: UpdateUserDto): Promise<ResponseResult> {
     await this.userService.update(param)
     await this.menuService.refreshPerms(param.id)
+    return this.res()
+  }
+  @Post('/password')
+  @Validate()
+  async updatePassword(@Body() dto: PasswordUserDto) {
+    await this.userService.forceUpdatePassword(dto.userId, dto.password)
     return this.res()
   }
   @Post('/delete')

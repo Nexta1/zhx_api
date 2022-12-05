@@ -64,13 +64,30 @@ export class TransferUserDto {
   @Rule(RuleType.number().required())
   departmentId: number
 }
+
 export class DeleteUserDto {
   @Rule(RuleType.array().items(RuleType.number()).required())
   id: number[]
 }
-export class UpdatePassword {
-  @Rule(RuleType.string().required)
+
+export class UpdatePersonInfoDto {
+  @Rule(RuleType.string().allow('').allow(null))
+  nickName: string
+
+  @Rule(RuleType.string().email().allow('').allow(null))
+  email: string
+
+  @Rule(RuleType.string().allow('').allow(null))
+  phone: string
+
+  @Rule(RuleType.string().allow('').allow(null))
+  remark: string
+}
+
+export class UpdatePasswordDto {
+  @Rule(RuleType.string().min(6).required())
   originPassword: string
+
   @Rule(
     RuleType.string()
       .min(6)
@@ -78,4 +95,17 @@ export class UpdatePassword {
       .required()
   )
   newPassword: string
+}
+
+export class PasswordUserDto {
+  @Rule(RuleType.number().integer().required())
+  userId: number
+
+  @Rule(
+    RuleType.string()
+      .min(6)
+      .pattern(/^[a-z0-9A-Z`~!#%^&*=+\\|{};:'\\",<>/?]+$/)
+      .required()
+  )
+  password: string
 }

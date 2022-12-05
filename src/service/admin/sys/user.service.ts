@@ -4,7 +4,8 @@ import { UserEntity } from '@/entity/sys/user.entity'
 import { In, Repository } from 'typeorm'
 import {
   CreateUserDto,
-  UpdatePassword,
+  UpdatePasswordDto,
+  UpdatePersonInfoDto,
   UpdateUserDto,
   UserDTO
 } from '@/dto/admin/sys/user.dto'
@@ -137,14 +138,17 @@ export class UserService extends BaseService {
     return dealResult
   }
 
-  // save
-  async createUser(params: UserDTO): Promise<boolean> {
+  /**
+   * 注册用户
+   * @param params
+   */
+  async register(params: UserDTO): Promise<boolean> {
     const salt = this.utils.generateRandomValue(32)
     const data = Object.assign(params, {
       password: this.utils.md5(params.password + salt),
       salt
     })
-    const res = await this.getUser(data)
+    const res = await this.info(data)
     if (res) {
       return false
     }
@@ -152,15 +156,26 @@ export class UserService extends BaseService {
     return true
   }
 
-  //find
-  async getUser(params) {
+  /**
+   * 获取信息
+   * @param params
+   */
+  async info(params) {
     const whereOpt = {}
     const { id, username } = params
     id && Object.assign(whereOpt, { id })
     username && Object.assign(whereOpt, { username })
     return await this.userModel.findOne({ where: whereOpt })
   }
-
+  /**
+   * 更新个人信息
+   */
+  async updatePersonInfo(
+    uid: number,
+    param: UpdatePersonInfoDto
+  ): Promise<void> {
+    await this.userModel.update(uid, param)
+  }
   /**
    * 修改信息
    * @param param
@@ -200,7 +215,7 @@ export class UserService extends BaseService {
    * @param uid
    * @param dto
    */
-  async updatePassword(uid: number, dto: UpdatePassword) {
+  async updatePassword(uid: number, dto: UpdatePasswordDto) {
     const user = await this.userModel.findOne({ where: { id: uid } })
     if (isEmpty(user)) {
       throw new Error('用户不存在')

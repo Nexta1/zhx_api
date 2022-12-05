@@ -18,7 +18,7 @@ export class LoginController extends BaseController {
   @Post('/register')
   @Validate()
   async createUser(@Body() user: UserDTO) {
-    const res = await this.userService.createUser(user)
+    const res = await this.userService.register(user)
     return this.handle(res)
   }
 
