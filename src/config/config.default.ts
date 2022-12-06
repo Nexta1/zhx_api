@@ -20,7 +20,7 @@ export default {
         host: '127.0.0.1',
         port: 3306,
         username: 'my',
-        password: '798868370',
+        password: '123456',
         database: 'my',
         synchronize: false, // 如果第一次使用，不存在表，有同步的需求可以写 true
         logging: false,

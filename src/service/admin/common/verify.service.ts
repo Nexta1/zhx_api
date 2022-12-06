@@ -63,6 +63,7 @@ export class VerifyService extends BaseService {
         username
       }
     })
+
     if (isEmpty(user)) {
       return null
     }
@@ -95,5 +96,4 @@ export class VerifyService extends BaseService {
     const perms = await this.menuService.getPermsByUid(uid)
     return { menus, perms }
   }
-
 }

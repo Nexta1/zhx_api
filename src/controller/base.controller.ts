@@ -5,14 +5,17 @@ import { RESCODE } from '@/constant/global'
 import BaseErrorCode from '@/exception/base.error'
 import SystemErrorCode from '@/exception/system.error'
 import { Context } from '@midwayjs/koa'
+
 export class BaseController {
   @Inject()
   utils: Utils
   @Inject()
   ctx: Context
+
   uid(): number {
     return this.ctx.state.user.payload.uid
   }
+
   /**
    * 响应成功
    * @param data
@@ -86,6 +89,7 @@ export class BaseController {
       }
     })
   }
+
   /**
    * ❌
    * @param code

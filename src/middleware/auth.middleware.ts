@@ -40,11 +40,15 @@ export class AuthMiddleware {
       }
       try {
         //jwt.verify方法验证token是否有效
-        ctx.state.user = await this.jwtService.verify(token, {
-          complete: true
-        })
+        ctx.state.user = await this.jwtService.verify(token)
       } catch (error) {
         return this.reject(ctx, { code: 11001 })
+      }
+      console.log(ctx.url.startsWith(`/account`))
+      // Token校验身份通过，判断是否需要权限的url，不需要权限则pass
+      if (ctx.url.startsWith(`/account`)) {
+        // 无需权限，则pass
+        return await next()
       }
       const perms = await this.redisService.get(
         'admin:perms:' + ctx.state.user.payload.uid

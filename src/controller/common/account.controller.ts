@@ -9,7 +9,7 @@ import {
 } from '@/dto/admin/sys/user.dto'
 import { UserService } from '@/service/admin/sys/user.service'
 
-@Controller('/account')
+@Controller(`/account`)
 export class AccountController extends BaseController {
   @Inject()
   verifyService: VerifyService
