@@ -25,14 +25,12 @@ export class AuthMiddleware {
       console.log(path)
       // 判断下有没有校验信息
       if (!ctx.headers['authorization']) {
-        this.reject(ctx, { code: 11001 })
-        return
+        return this.reject(ctx, { code: 11001 })
       }
       // 从 header 上获取校验信息
       const parts = ctx.get('authorization').trim().split(' ')
       if (parts.length !== 2) {
-        this.reject(ctx, { code: 11001 })
-        return
+        return this.reject(ctx, { code: 11001 })
       }
       const [scheme, token] = parts
       if (!/^Bearer$/i.test(scheme)) {
@@ -40,15 +38,15 @@ export class AuthMiddleware {
       }
       try {
         //jwt.verify方法验证token是否有效
-        ctx.state.user = await this.jwtService.verify(token)
+        ctx.state.user = await this.jwtService.verify(token, { complete: true })
       } catch (error) {
         return this.reject(ctx, { code: 11001 })
       }
-      console.log(ctx.url.startsWith(`/account`))
       // Token校验身份通过，判断是否需要权限的url，不需要权限则pass
       if (ctx.url.startsWith(`/account`)) {
         // 无需权限，则pass
-        return await next()
+        await next()
+        return
       }
       const perms = await this.redisService.get(
         'admin:perms:' + ctx.state.user.payload.uid
