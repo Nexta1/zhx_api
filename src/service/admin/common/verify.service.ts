@@ -9,6 +9,7 @@ import { IImageCaptchaResult } from '@/service/interface'
 import { MenuService } from '@/service/admin/sys/menu.service'
 import { RedisService } from '@midwayjs/redis'
 import { BaseService } from '@/service/base.service'
+import { LoginLogService } from '@/service/admin/common/login_log.service'
 
 @Provide()
 export class VerifyService extends BaseService {
@@ -22,7 +23,8 @@ export class VerifyService extends BaseService {
   utils: Utils
   @Inject()
   redisService: RedisService
-
+  @Inject()
+  loginLog: LoginLogService
   /**
    * 获取验证码
    */
@@ -81,10 +83,9 @@ export class VerifyService extends BaseService {
       }
     )
     const perms = await this.menuService.getPermsByUid(user.id)
-
-    console.log(await this.redisService.set('admin:pv:' + user.id, 1))
     await this.redisService.set(`admin:token:` + user.id, jwtSign)
     await this.redisService.set('admin:perms:' + user.id, JSON.stringify(perms))
+    await this.loginLog.save(user.id)
     return jwtSign
   }
 

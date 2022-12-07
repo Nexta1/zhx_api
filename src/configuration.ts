@@ -13,6 +13,7 @@ import * as jwt from '@midwayjs/jwt'
 import * as passport from '@midwayjs/passport'
 import * as i18n from '@midwayjs/i18n'
 import * as redis from '@midwayjs/redis'
+import * as bull from '@midwayjs/bull'
 // eslint-disable-next-line node/no-unpublished-import
 import 'tsconfig-paths/register'
 import * as captcha from '@midwayjs/captcha'
@@ -31,6 +32,7 @@ import { AuthMiddleware } from '@/middleware/auth.middleware'
     redis,
     captcha,
     cache,
+    bull,
     {
       component: info,
       enabledEnvironment: ['local']

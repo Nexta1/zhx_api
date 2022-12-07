@@ -6,7 +6,7 @@ import { JwtService } from '@midwayjs/jwt'
 import { res } from '@/common/utils'
 import { ResponseResult } from '@/interface'
 import { RedisService } from '@midwayjs/redis'
-import { isEmpty } from 'lodash'
+import { isEmpty, trimStart } from 'lodash'
 
 @Middleware()
 export class AuthMiddleware {
@@ -22,26 +22,32 @@ export class AuthMiddleware {
   resolve() {
     return async (ctx: Context, next: NextFunction) => {
       const path = ctx.url.split('?')[0]
+      console.log(ctx.ip)
       console.log(path)
+      console.log(ctx.get('user-agent'))
       // 判断下有没有校验信息
       if (!ctx.headers['authorization']) {
         return this.reject(ctx, { code: 11001 })
       }
+
       // 从 header 上获取校验信息
       const parts = ctx.get('authorization').trim().split(' ')
       if (parts.length !== 2) {
         return this.reject(ctx, { code: 11001 })
       }
+
       const [scheme, token] = parts
       if (!/^Bearer$/i.test(scheme)) {
         return this.reject(ctx, { code: 11001 })
       }
+
       try {
         //jwt.verify方法验证token是否有效
         ctx.state.user = await this.jwtService.verify(token, { complete: true })
       } catch (error) {
         return this.reject(ctx, { code: 11001 })
       }
+
       // Token校验身份通过，判断是否需要权限的url，不需要权限则pass
       if (ctx.url.startsWith(`/account`)) {
         // 无需权限，则pass
@@ -54,18 +60,22 @@ export class AuthMiddleware {
       const pv = await this.redisService.get(
         `admin:passwordVersion:${ctx.state.user.payload.uid}`
       )
+
       if (!ctx.state.user) {
         return this.reject(ctx, { code: 11001 })
       }
+
       if (pv !== ctx.state.user.payload.pv) {
         // 密码版本不一致，登录期间已更改过密码
         this.reject(ctx, { code: 11002 })
       }
-      if (!isEmpty(perms)) {
+
+      if (isEmpty(perms)) {
         return this.reject(ctx, { code: 11001 })
       }
       const permsArray = JSON.parse(perms).map(r => r.replace(/:/g, '/'))
-      if (!permsArray.includes(path)) {
+      console.log(permsArray)
+      if (!permsArray.includes(trimStart(path, '/'))) {
         return this.reject(ctx, { code: 11003 })
       }
       await next()

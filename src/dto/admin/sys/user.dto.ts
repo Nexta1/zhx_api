@@ -1,6 +1,6 @@
 // src/dto/user.ts
 import { Rule, RuleType } from '@midwayjs/validate'
-import { PageSearchDto } from '@/dto/comm.dto'
+import { PageSearchDto } from '@/dto/page.dto'
 
 export class UserDTO {
   @Rule(RuleType.string().required())

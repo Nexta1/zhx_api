@@ -8,7 +8,7 @@ import {
   UpdateRoleDto
 } from '@/dto/admin/sys/role.dto'
 import { Validate } from '@midwayjs/validate'
-import { PageSearchDto } from '@/dto/comm.dto'
+import { PageSearchDto } from '@/dto/page.dto'
 import { MenuService } from '@/service/admin/sys/menu.service'
 
 @Controller('/sys/role')

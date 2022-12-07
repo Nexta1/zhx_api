@@ -38,5 +38,14 @@ export default {
       db: 0
     }
   },
+  bull: {
+    defaultQueueOptions: {
+      redis: {
+        port: 6379,
+        host: '127.0.0.1',
+        password: ''
+      }
+    }
+  },
   superRoleId: 1
 } as MidwayConfig

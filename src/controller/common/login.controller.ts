@@ -40,6 +40,7 @@ export class LoginController extends BaseController {
     }
     const { password, username } = loginInfo
     const res = await this.verifyService.getLoginSign(username, password)
+
     if (isEmpty(res)) {
       return this.res({ code: 10003 })
     }
