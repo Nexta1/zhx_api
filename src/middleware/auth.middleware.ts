@@ -6,7 +6,7 @@ import { JwtService } from '@midwayjs/jwt'
 import { res } from '@/common/utils'
 import { ResponseResult } from '@/interface'
 import { RedisService } from '@midwayjs/redis'
-import { isEmpty, trimStart } from 'lodash'
+import { isEmpty, toNumber, trimStart } from 'lodash'
 
 @Middleware()
 export class AuthMiddleware {
@@ -22,9 +22,6 @@ export class AuthMiddleware {
   resolve() {
     return async (ctx: Context, next: NextFunction) => {
       const path = ctx.url.split('?')[0]
-      console.log(ctx.ip)
-      console.log(path)
-      console.log(ctx.get('user-agent'))
       // 判断下有没有校验信息
       if (!ctx.headers['authorization']) {
         return this.reject(ctx, { code: 11001 })
@@ -57,6 +54,7 @@ export class AuthMiddleware {
       const perms = await this.redisService.get(
         'admin:perms:' + ctx.state.user.payload.uid
       )
+      //todo redis为string
       const pv = await this.redisService.get(
         `admin:passwordVersion:${ctx.state.user.payload.uid}`
       )
@@ -65,16 +63,15 @@ export class AuthMiddleware {
         return this.reject(ctx, { code: 11001 })
       }
 
-      if (pv !== ctx.state.user.payload.pv) {
+      if (toNumber(pv) !== ctx.state.user.payload.pv) {
         // 密码版本不一致，登录期间已更改过密码
-        this.reject(ctx, { code: 11002 })
+        return this.reject(ctx, { code: 11002 })
       }
 
       if (isEmpty(perms)) {
         return this.reject(ctx, { code: 11001 })
       }
       const permsArray = JSON.parse(perms).map(r => r.replace(/:/g, '/'))
-      console.log(permsArray)
       if (!permsArray.includes(trimStart(path, '/'))) {
         return this.reject(ctx, { code: 11003 })
       }

@@ -86,6 +86,7 @@ export class VerifyService extends BaseService {
       }
     )
     const perms = await this.menuService.getPermsByUid(user.id)
+    await this.redisService.set(`admin:passwordVersion:${user!.id}`, 1)
     await this.redisService.set(`admin:token:` + user.id, jwtSign)
     await this.redisService.set('admin:perms:' + user.id, JSON.stringify(perms))
     await this.loginLog.save(user.id)
