@@ -10,6 +10,7 @@ import { MenuService } from '@/service/admin/sys/menu.service'
 import { RedisService } from '@midwayjs/redis'
 import { BaseService } from '@/service/base.service'
 import { LoginLogService } from '@/service/admin/common/login_log.service'
+import { UserService } from '@/service/admin/sys/user.service'
 
 @Provide()
 export class VerifyService extends BaseService {
@@ -17,6 +18,8 @@ export class VerifyService extends BaseService {
   captchaService: CaptchaService
   @Inject()
   menuService: MenuService
+  @Inject()
+  userService: UserService
   @InjectEntityModel(UserEntity)
   userModel: Repository<UserEntity>
   @Inject()
@@ -88,7 +91,9 @@ export class VerifyService extends BaseService {
     await this.loginLog.save(user.id)
     return jwtSign
   }
-
+  async clearLoginStatus(uid: number) {
+    await this.userService.forbidden(uid)
+  }
   /**
    * 获取用户权限菜单
    * @param uid

@@ -198,6 +198,9 @@ export class UserService extends BaseService {
       })
       await manager.insert(SysUserRole, insertRoles)
       //todo 禁用客戶
+      if (param.status === 0) {
+        await this.forbidden(param.id)
+      }
     })
   }
 
@@ -259,5 +262,10 @@ export class UserService extends BaseService {
         parseInt(version) + 1
       )
     }
+  }
+  async forbidden(uid: number) {
+    await this.redisService.del(`admin:token:${uid}`)
+    await this.redisService.del(`admin:perms:${uid}`)
+    await this.redisService.del(`admin:passwordVersion:${uid}`)
   }
 }

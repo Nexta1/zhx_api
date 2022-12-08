@@ -4,6 +4,8 @@ import { RedisService } from '@midwayjs/redis'
 import { InjectEntityModel } from '@midwayjs/typeorm'
 import SysLoginLog from '@/entity/sys/login_log.entity'
 import { Repository } from 'typeorm'
+import { isEmpty } from 'lodash'
+import { UAParser } from 'ua-parser-js'
 @Provide()
 export class OnlineService extends BaseService {
   @Inject()
@@ -20,19 +22,27 @@ export class OnlineService extends BaseService {
   }
   async findLastLoginInfoList(ids: number[]) {
     //todo
-    const result = await this.getManager().query(
-      `
-    SELECT n.*, u.username
-      FROM sys_login_log n
-      INNER JOIN (
-        SELECT user_id, MAX(create_time)AS createTime
-        FROM sys_login_log GROUP BY user_id
-      ) AS max USING (user_id, createTime)
-      INNER JOIN sys_user u ON n.user_id = u.id
-      WHERE n.user_id IN (?)
-    `,
-      [ids]
-    )
-    return result
+    const result = await this.loginModel
+      .createQueryBuilder('log')
+      .innerJoinAndSelect('sys_user', 'user', 'user.id=log.user_id')
+      .select(['MAX(log.create_time) createTime', 'user', 'log'])
+      .groupBy('log.user_id')
+      .getRawMany()
+    if (!isEmpty(result)) {
+      const parser = new UAParser()
+      return result.map(e => {
+        const u = parser.setUA(e.log_ua).getResult()
+        return {
+          id: e.user_id,
+          ip: e.ip,
+          username: e.user_username,
+          time: e.createTime,
+          os: `${u.os.name} ${u.os.version}`,
+          browser: `${u.browser.name} ${u.browser.version}`
+        }
+      })
+    } else {
+      return []
+    }
   }
 }

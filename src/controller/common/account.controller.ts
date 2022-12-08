@@ -45,4 +45,9 @@ export class AccountController extends BaseController {
       return this.res({ code: 10011 })
     }
   }
+  @Post('/logout')
+  async logout() {
+    await this.verifyService.clearLoginStatus(this.uid())
+    return this.res()
+  }
 }
