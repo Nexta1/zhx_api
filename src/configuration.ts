@@ -1,4 +1,4 @@
-import { App, Configuration } from '@midwayjs/decorator'
+import { App, Configuration, Inject } from '@midwayjs/decorator'
 import * as koa from '@midwayjs/koa'
 import * as validate from '@midwayjs/validate'
 import * as info from '@midwayjs/info'
@@ -18,7 +18,7 @@ import * as bull from '@midwayjs/bull'
 import 'tsconfig-paths/register'
 import * as captcha from '@midwayjs/captcha'
 import { AuthMiddleware } from '@/middleware/auth.middleware'
-
+import * as bullBoard from '@midwayjs/bull-board'
 @Configuration({
   imports: [
     koa,
@@ -33,6 +33,7 @@ import { AuthMiddleware } from '@/middleware/auth.middleware'
     captcha,
     cache,
     bull,
+    bullBoard,
     {
       component: info,
       enabledEnvironment: ['local']
@@ -41,10 +42,12 @@ import { AuthMiddleware } from '@/middleware/auth.middleware'
   importConfigs: [join(__dirname, './config')]
 })
 export class ContainerLifeCycle {
+  @Inject()
+  bullFramework: bull.Framework
   @App()
   app: koa.Application
 
-  async onReady() {
+  async onReady(): Promise<void> {
     // add middleware
     this.app.useMiddleware([AuthMiddleware])
     // add filter
