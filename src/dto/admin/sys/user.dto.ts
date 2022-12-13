@@ -55,7 +55,7 @@ export class LoginInfoDto {
 }
 
 export class PageUserDto extends PageSearchDto {
-  @Rule(RuleType.array().items(RuleType.number()).min(1).optional())
+  @Rule(RuleType.array().items(RuleType.number()).optional())
   departmentIds: number[]
 }
 export class TransferUserDto {

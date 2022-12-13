@@ -19,6 +19,7 @@ import 'tsconfig-paths/register'
 import * as captcha from '@midwayjs/captcha'
 import { AuthMiddleware } from '@/middleware/auth.middleware'
 import * as bullBoard from '@midwayjs/bull-board'
+import * as socketio from '@midwayjs/socketio'
 @Configuration({
   imports: [
     koa,
@@ -34,6 +35,7 @@ import * as bullBoard from '@midwayjs/bull-board'
     cache,
     bull,
     bullBoard,
+    socketio,
     {
       component: info,
       enabledEnvironment: ['local']

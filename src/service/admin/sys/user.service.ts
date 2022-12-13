@@ -89,8 +89,8 @@ export class UserService extends BaseService {
    * @param count
    */
   async page(uid: number, deptIds: number[], page: number, count: number) {
-    console.log(count)
-    const queryAll = !isEmpty(deptIds)
+    const queryAll = isEmpty(deptIds)
+    console.log(queryAll)
     //todo 沒寫管理員
     const res = await this.userModel
       .createQueryBuilder('user')

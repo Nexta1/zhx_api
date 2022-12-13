@@ -44,7 +44,12 @@ export class AuthMiddleware {
       } catch (error) {
         return this.reject(ctx, { code: 11001 })
       }
-
+      const redisToken = await this.redisService.get(
+        'admin:token:' + ctx.state.user.payload.uid
+      )
+      if (token !== redisToken) {
+        return this.reject(ctx, { code: 11001 })
+      }
       // Token校验身份通过，判断是否需要权限的url，不需要权限则pass
       if (ctx.url.startsWith(`/account`)) {
         // 无需权限，则pass

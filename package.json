@@ -18,6 +18,7 @@
     "@midwayjs/logger": "^2.14.0",
     "@midwayjs/passport": "^3.8.0",
     "@midwayjs/redis": "^3.8.0",
+    "@midwayjs/socketio": "^3.8.0",
     "@midwayjs/static-file": "^3.8.0",
     "@midwayjs/swagger": "^3.8.0",
     "@midwayjs/typeorm": "^3.8.0",

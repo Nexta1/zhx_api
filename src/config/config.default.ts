@@ -6,6 +6,13 @@ export default {
   koa: {
     port: 7001
   },
+  socketIO: {
+    port: 7002,
+    cors: {
+      origin: 'http://localhost:8080',
+      methods: ['GET', 'POST']
+    }
+  },
   jwt: {
     secret: 'zhx_password', // fs.readFileSync('xxxxx.key')
     expiresIn: '2d' // https://github.com/vercel/ms
